@@ -178,59 +178,61 @@ void myInitMaleSKel()
         printf("Erro! Arquivo não encontrado!\n");
         exit(EXIT_FAILURE);
     }
+    float offsets [27][3];
+    int countOffsets = 0;
     char aux[200];
     for(int i = 0; i < 125; i++){
         line =  strstr(fgets(aux, 200, arq), "{");
-        printf("The substring is: %s\n", line);
+        //printf("The substring is: %s\n", line);
         if(line != NULL){
             char offsetStr[6];
-            float num1;
-            float num2;
-            float num3;
-            fscanf(arq, "%s %f %f %f", offsetStr, &num1, &num2, &num3); // tenta ler o no.
-            printf("offset string: %s\n", offsetStr);
-            printf("Número1: %f\n", num1);
-            printf("Número2: %f\n", num2);
-            printf("Número3: %f\n", num3);
+            fscanf(arq, "%s %f %f %f", offsetStr, &offsets[countOffsets][0], &offsets[countOffsets][1], &offsets[countOffsets][2]); // tenta ler o no.
+            //printf("offset string: %s\n", offsetStr);
+            if(countOffsets <5){
+                printf("Número1: %f\n", offsets[countOffsets][0]);
+                printf("Número2: %f\n", offsets[countOffsets][1]);
+                printf("Número3: %f\n", offsets[countOffsets][2]);
+            }
+            countOffsets++;
         }
     }
     //printf("c: %c\n", fgetc(arq));
     rewind(arq);
 
-    root = createNode("Hips", NULL, 6, 0, 0, 0, 3);
+    root = createNode("Hips", NULL, 6, offsets[0][0], offsets[0][1], offsets[0][2], 3);
 
-    Node* toSpine = createNode("ToSpine", root, 3, -2.69724, 7.43032, -0.144315, 1);
-    Node* spine = createNode("Spine", toSpine, 3, -0.0310711, 10.7595, 1.96963, 1);
-    Node* spine1 = createNode("Spine1", spine, 3, 19.9056, 3.91189, 0.764692, 3);
+    Node* toSpine = createNode("ToSpine", root, 3, offsets[1][0], offsets[1][1], offsets[1][2], 1);
+    Node* spine = createNode("Spine", toSpine, 3, offsets[2][0], offsets[2][1], offsets[2][2], 1);
+    Node* spine1 = createNode("Spine1", spine, 3, offsets[3][0], offsets[3][1], offsets[3][2], 3);
 
-    Node* neck = createNode("Neck", spine1, 3, 25.9749, 7.03908, -0.130764, 1);
-    Node* head = createNode("Head", neck, 3, 9.52751, 0.295786, -0.907742, 1);
-    Node* top = createNode("Top", head, 3, 16.4037, 0.713936, 2.7358, 0);
-
-    /**/
-    Node* leftShoulder = createNode("LeftShoulder", spine1, 3, 17.7449, 4.33886, 11.7777, 1);
-    Node* leftArm = createNode("LeftArm", leftShoulder, 3, 0.911315, 1.27913, 9.80584, 1);
-    Node* leftForeArm = createNode("LeftForeArm", leftArm, 3, 28.61265, 1.18197, -3.53199, 1);
-    Node* leftHand = createNode("LeftHand", leftForeArm, 3, 27.5088, 0.0218783, 0.327423, 1);
-    Node* endLeftHand = createNode("EndLHand", leftHand, 3, 18.6038, -0.000155887, 0.382096, 0);
+    Node* neck = createNode("Neck", spine1, 3, offsets[4][0], offsets[4][1], offsets[4][2], 1);
+    Node* head = createNode("Head", neck, 3, offsets[5][0], offsets[5][1], offsets[5][2], 1);
+    Node* top = createNode("Top", head, 3, offsets[6][0], offsets[6][1], offsets[6][2], 0);
 
     /**/
-    Node* rShoulder = createNode("RShoulder", spine1, 3, 17.1009, 2.89543, -12.2328, 1);
-    Node* rArm = createNode("RArm", rShoulder, 3, 1.4228, 0.178766, -10.211, 1);
-    Node* rForeArm = createNode("RForeArm", rArm, 3, 28.733, 1.87905, 2.64907, 1);
-    Node* rHand = createNode("RHand", rForeArm, 3, 27.4588, 0.290562, -0.101845, 1);
-    Node* endRHand = createNode("RLHand", rHand, 3, 17.8396, -0.255518, -0.000602873, 0);
+    Node* leftShoulder = createNode("LeftShoulder", spine1, 3, offsets[7][0], offsets[7][1], offsets[7][2], 1);
+    Node* leftArm = createNode("LeftArm", leftShoulder, 3, offsets[8][0], offsets[8][1], offsets[8][2], 1);
+    Node* leftForeArm = createNode("LeftForeArm", leftArm, 3, offsets[9][0], offsets[9][1], offsets[9][2], 1);
+    Node* leftHand = createNode("LeftHand", leftForeArm, 3, offsets[10][0], offsets[10][1], offsets[10][2], 1);
+    Node* endLeftHand = createNode("EndLHand", leftHand, 3, offsets[11][0], offsets[11][1], offsets[11][2], 0);
 
-    Node* lUpLeg = createNode("LUpLeg", root, 3, -5.61296, -2.22332, -10.2353, 1);
-    Node* lLeg = createNode("LLeg", lUpLeg, 3, 2.56703, -44.7417, -7.93097, 1);
-    Node* lFoot = createNode("LFoot", lLeg, 3, 3.16933, -46.5642, -3.96578, 1);
-    Node* lToe = createNode("LToe", lFoot, 3, 0.346054, -6.02161, 12.8035, 1);
-    Node* lToe2 = createNode("LToe2", lToe, 3, 0.134235, -1.35082, 5.13018, 0);
+    /**/
+    Node* rShoulder = createNode("RShoulder", spine1, 3, offsets[12][0], offsets[12][1], offsets[12][2], 1);
+    Node* rArm = createNode("RArm", rShoulder, 3, offsets[13][0], offsets[13][1], offsets[13][2], 1);
+    Node* rForeArm = createNode("RForeArm", rArm, 3, offsets[14][0], offsets[14][1], offsets[14][2], 1);
+    Node* rHand = createNode("RHand", rForeArm, 3, offsets[15][0], offsets[15][1], offsets[15][2], 1);
+    Node* endRHand = createNode("RLHand", rHand, 3, offsets[16][0], offsets[16][0], offsets[16][0], 0);
 
-    Node* rUpLeg = createNode("RUpLeg", root, 3, -5.7928, -1.72406, 10.6446, 1);
-    Node* rLeg = createNode("RLeg", rUpLeg, 3, -2.57161, -44.7178, -7.85259, 1);
-    Node* rFoot = createNode("RFoot", rLeg, 3, -3.10148, -46.5936, -4.03391, 1);
-    Node* rToe = createNode("RToe", rFoot, 3, -0.0828122, -6.13587, 12.8035, 1);
+    Node* lUpLeg = createNode("LUpLeg", root, 3, offsets[17][0], offsets[17][1], offsets[17][2], 1);
+    Node* lLeg = createNode("LLeg", lUpLeg, 3, offsets[18][0], offsets[18][1], offsets[18][2], 1);
+    Node* lFoot = createNode("LFoot", lLeg, 3, offsets[19][0], offsets[19][1], offsets[19][2], 1);
+    Node* lToe = createNode("LToe", lFoot, 3, offsets[20][0], offsets[20][1], offsets[20][2], 1);
+    Node* lToe2 = createNode("LToe2", lToe, 3, offsets[21][0], offsets[21][1], offsets[21][2], 0);
+
+    Node* rUpLeg = createNode("RUpLeg", root, 3, offsets[22][0], offsets[22][1], offsets[22][2], 1);
+    Node* rLeg = createNode("RLeg", rUpLeg, 3, offsets[23][0], offsets[23][1], offsets[23][2], 1);
+    Node* rFoot = createNode("RFoot", rLeg, 3, offsets[24][0], offsets[24][1], offsets[24][2], 1);
+    Node* rToe = createNode("RToe", rFoot, 3, offsets[25][0], offsets[25][1], offsets[25][2], 1);
     Node* rToe2 = createNode("RToe2", rToe, 3, -0.131328, -1.35082, 5.13018, 0);
 
     apply();
