@@ -37,7 +37,7 @@ struct Node {
 Node* root;
 
 // Total de frames
-int totalFrames;
+int totalFrames = 282;
 
 // Frame atual
 int curFrame = 0;
@@ -97,6 +97,7 @@ Node* createNode(char name[20], Node* parent, int numChannels, float ofx, float 
 //
 // DADOS DE EXEMPLO DO PRIMEIRO FRAME
 //
+float animData[282][69];
 
 float data[] = { -326.552, 98.7701, 317.634, 71.4085, 60.8487, 17.2406, -70.1915, 0, 88.8779, 84.6529, 68.0632,
                  -5.27801, 0.719492, 15.2067, 13.3733, -135.039, 24.774, 172.053, -171.896, 64.9682, -165.105,
@@ -107,7 +108,9 @@ float data[] = { -326.552, 98.7701, 317.634, 71.4085, 60.8487, 17.2406, -70.1915
                  -1.99744, -3.70506, 1.06523, 0.577189, 0.146783, 3.70013, 2.9702 };
 
 // Pos. da aplicacao dos dados
+
 int dataPos;
+
 
 void applyData(float data[], Node* n)
 {
@@ -126,76 +129,126 @@ void applyData(float data[], Node* n)
 void apply()
 {
     dataPos = 0;
-    applyData(data, root);
+    applyData(animData[curFrame], root);
 }
 
 void myInitMaleSKel()
 {
     char *line;
-    FILE* arq = fopen("bvh/Male1_A1_Stand.bvh", "r");
+    FILE* arq = fopen("bvh/Male1_A6_LiftBox.bvh", "r");
     if(arq == NULL) {
         printf("Erro! Arquivo não encontrado!\n");
         exit(EXIT_FAILURE);
     }
-    float offsets [27][3];
+    float offsets [27][3]; //guarda as posicoes para cada membro do corpo sendo [membro do corpo][posicao x, y ou z]
+    int channels [27];
     int countOffsets = 0;
-    char aux[200];
+    int referenceNumChild = 0;
+    int numChild [27];
+    char aux [2000];
     for(int i = 0; i < 125; i++){
         line =  strstr(fgets(aux, 200, arq), "{");
         //printf("The substring is: %s\n", line);
         if(line != NULL){
-            char offsetStr[6];
-            fscanf(arq, "%s %f %f %f", offsetStr, &offsets[countOffsets][0], &offsets[countOffsets][1], &offsets[countOffsets][2]); // tenta ler o no.
-            //printf("offset string: %s\n", offsetStr);
-            if(countOffsets <5){
+            char lixo[9];
+            fscanf(arq, "%s %f %f %f", lixo, &offsets[countOffsets][0], &offsets[countOffsets][1], &offsets[countOffsets][2]); // tenta ler o no.
+            fscanf(arq, "%s %d", lixo, &channels[countOffsets]);
+            if(channels[countOffsets] > 100 || channels[countOffsets] < 0){
+                channels[countOffsets] = 0;
+            }
+                        //printf("offset string: %s\n", offsetStr);
+            if(countOffsets < 26){
                 printf("Número1: %f\n", offsets[countOffsets][0]);
                 printf("Número2: %f\n", offsets[countOffsets][1]);
                 printf("Número3: %f\n", offsets[countOffsets][2]);
+                printf("Channel: %d\n", channels[countOffsets]);
             }
             countOffsets++;
         }
     }
+
     //printf("c: %c\n", fgetc(arq));
     rewind(arq);
+    root = createNode("Hips", NULL, channels[0], offsets[0][0], offsets[0][1], offsets[0][2], 3);
 
-    root = createNode("Hips", NULL, 6, offsets[0][0], offsets[0][1], offsets[0][2], 3);
+    Node* toSpine = createNode("ToSpine", root, channels[1], offsets[1][0], offsets[1][1], offsets[1][2], 1);
+    Node* spine = createNode("Spine", toSpine, channels[2], offsets[2][0], offsets[2][1], offsets[2][2], 1);
+    Node* spine1 = createNode("Spine1", spine, channels[3], offsets[3][0], offsets[3][1], offsets[3][2], 3);
 
-    Node* toSpine = createNode("ToSpine", root, 3, offsets[1][0], offsets[1][1], offsets[1][2], 1);
-    Node* spine = createNode("Spine", toSpine, 3, offsets[2][0], offsets[2][1], offsets[2][2], 1);
-    Node* spine1 = createNode("Spine1", spine, 3, offsets[3][0], offsets[3][1], offsets[3][2], 3);
-
-    Node* neck = createNode("Neck", spine1, 3, offsets[4][0], offsets[4][1], offsets[4][2], 1);
-    Node* head = createNode("Head", neck, 3, offsets[5][0], offsets[5][1], offsets[5][2], 1);
-    Node* top = createNode("Top", head, 3, offsets[6][0], offsets[6][1], offsets[6][2], 0);
-
-    /**/
-    Node* leftShoulder = createNode("LeftShoulder", spine1, 3, offsets[7][0], offsets[7][1], offsets[7][2], 1);
-    Node* leftArm = createNode("LeftArm", leftShoulder, 3, offsets[8][0], offsets[8][1], offsets[8][2], 1);
-    Node* leftForeArm = createNode("LeftForeArm", leftArm, 3, offsets[9][0], offsets[9][1], offsets[9][2], 1);
-    Node* leftHand = createNode("LeftHand", leftForeArm, 3, offsets[10][0], offsets[10][1], offsets[10][2], 1);
-    Node* endLeftHand = createNode("EndLHand", leftHand, 3, offsets[11][0], offsets[11][1], offsets[11][2], 0);
+    Node* neck = createNode("Neck", spine1, channels[4], offsets[4][0], offsets[4][1], offsets[4][2], 1);
+    Node* head = createNode("Head", neck, channels[5], offsets[5][0], offsets[5][1], offsets[5][2], 1);
+    Node* top = createNode("Top", head, channels[6], offsets[6][0], offsets[6][1], offsets[6][2], 0);
 
     /**/
-    Node* rShoulder = createNode("RShoulder", spine1, 3, offsets[12][0], offsets[12][1], offsets[12][2], 1);
-    Node* rArm = createNode("RArm", rShoulder, 3, offsets[13][0], offsets[13][1], offsets[13][2], 1);
-    Node* rForeArm = createNode("RForeArm", rArm, 3, offsets[14][0], offsets[14][1], offsets[14][2], 1);
-    Node* rHand = createNode("RHand", rForeArm, 3, offsets[15][0], offsets[15][1], offsets[15][2], 1);
-    Node* endRHand = createNode("RLHand", rHand, 3, offsets[16][0], offsets[16][1], offsets[16][2], 0);
+    Node* leftShoulder = createNode("LeftShoulder", spine1, channels[7], offsets[7][0], offsets[7][1], offsets[7][2], 1);
+    Node* leftArm = createNode("LeftArm", leftShoulder, channels[8], offsets[8][0], offsets[8][1], offsets[8][2], 1);
+    Node* leftForeArm = createNode("LeftForeArm", leftArm, channels[9], offsets[9][0], offsets[9][1], offsets[9][2], 1);
+    Node* leftHand = createNode("LeftHand", leftForeArm, channels[10], offsets[10][0], offsets[10][1], offsets[10][2], 1);
+    Node* endLeftHand = createNode("EndLHand", leftHand, channels[11], offsets[11][0], offsets[11][1], offsets[11][2], 0);
 
-    Node* lUpLeg = createNode("LUpLeg", root, 3, offsets[17][0], offsets[17][1], offsets[17][2], 1);
-    Node* lLeg = createNode("LLeg", lUpLeg, 3, offsets[18][0], offsets[18][1], offsets[18][2], 1);
-    Node* lFoot = createNode("LFoot", lLeg, 3, offsets[19][0], offsets[19][1], offsets[19][2], 1);
-    Node* lToe = createNode("LToe", lFoot, 3, offsets[20][0], offsets[20][1], offsets[20][2], 1);
-    Node* lToe2 = createNode("LToe2", lToe, 3, offsets[21][0], offsets[21][1], offsets[21][2], 0);
+    /**/
+    Node* rShoulder = createNode("RShoulder", spine1, channels[12], offsets[12][0], offsets[12][1], offsets[12][2], 1);
+    Node* rArm = createNode("RArm", rShoulder, channels[13], offsets[13][0], offsets[13][1], offsets[13][2], 1);
+    Node* rForeArm = createNode("RForeArm", rArm, channels[14], offsets[14][0], offsets[14][1], offsets[14][2], 1);
+    Node* rHand = createNode("RHand", rForeArm, channels[15], offsets[15][0], offsets[15][1], offsets[15][2], 1);
+    Node* endRHand = createNode("RLHand", rHand, channels[16], offsets[16][0], offsets[16][1], offsets[16][2], 0);
 
-    Node* rUpLeg = createNode("RUpLeg", root, 3, offsets[22][0], offsets[22][1], offsets[22][2], 1);
-    Node* rLeg = createNode("RLeg", rUpLeg, 3, offsets[23][0], offsets[23][1], offsets[23][2], 1);
-    Node* rFoot = createNode("RFoot", rLeg, 3, offsets[24][0], offsets[24][1], offsets[24][2], 1);
-    Node* rToe = createNode("RToe", rFoot, 3, offsets[25][0], offsets[25][1], offsets[25][2], 1);
-    Node* rToe2 = createNode("RToe2", rToe, 3, -offsets[26][0], offsets[26][1], offsets[26][2], 0);
+    Node* lUpLeg = createNode("LUpLeg", root, channels[17], offsets[17][0], offsets[17][1], offsets[17][2], 1);
+    Node* lLeg = createNode("LLeg", lUpLeg, channels[18], offsets[18][0], offsets[18][1], offsets[18][2], 1);
+    Node* lFoot = createNode("LFoot", lLeg, channels[19], offsets[19][0], offsets[19][1], offsets[19][2], 1);
+    Node* lToe = createNode("LToe", lFoot, channels[20], offsets[20][0], offsets[20][1], offsets[20][2], 1);
+    Node* lToe2 = createNode("LToe2", lToe, channels[21], offsets[21][0], offsets[21][1], offsets[21][2], 0);
 
+    Node* rUpLeg = createNode("RUpLeg", root, channels[22], offsets[22][0], offsets[22][1], offsets[22][2], 1);
+    Node* rLeg = createNode("RLeg", rUpLeg, channels[23], offsets[23][0], offsets[23][1], offsets[23][2], 1);
+    Node* rFoot = createNode("RFoot", rLeg, channels[24], offsets[24][0], offsets[24][1], offsets[24][2], 1);
+    Node* rToe = createNode("RToe", rFoot, channels[25], offsets[25][0], offsets[25][1], offsets[25][2], 1);
+    Node* rToe2 = createNode("RToe2", rToe, channels[26], offsets[26][0], offsets[26][1], offsets[26][2], 0);
+
+
+    int dataCount = 1;
+    for(int i = 0; i < 134; i++){
+        fgets(aux, 200, arq);
+    }
+    printf("aux: %s\n", aux);
+    int channelSum = 0;
+    for(int i = 0; i < 27; i++){
+        printf("channel: %d\n", channels[i]);
+        for(int j = 0; j < channels[i]; j++){
+            channelSum = channelSum + 1;
+        }
+    }
+    for(int i = 0; i < 282; i++){
+        for(int j = 0; j < channelSum; j++){
+            fscanf(arq, "%f", &animData[i][j]);
+            printf("data read: %f \n", animData[i][j]);
+        }
+    }
+
+    //createData(&channels);
     apply();
 }
+
+/*void createData(int *channels[]){
+    float auxf = 0;
+    while(dataCount < 5){
+        fscanf(arq, "%f", &auxf);
+        if(auxf == 0){
+            break;
+        }
+        animData[0][0] = auxf;
+        printf("animData: %f\n", animData[0][0]);
+        for(int i = 0; i < 27; i++){
+            for(int j = 0; j < channels[i]; j++){
+                fscanf(arq, "%f", &animData[0][dataCount]);
+                //printf("animData: %f -- ", animData[0][dataCount]);
+                dataCount++;
+            }
+        }
+
+        dataCount = 1;
+    }
+}*/
 
 float orange[] = { 1, 0.5, 0 };
 float yellow[] = { 1, 1, 0 };
