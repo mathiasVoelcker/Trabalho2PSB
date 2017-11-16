@@ -37,7 +37,7 @@ struct Node {
 Node* root;
 
 // Total de frames
-int totalFrames = 282;
+int totalFrames = 0;
 
 // Frame atual
 int curFrame = 0;
@@ -135,7 +135,7 @@ void apply()
 void myInitMaleSKel()
 {
     char *line;
-    FILE* arq = fopen("bvh/Male1_A6_LiftBox.bvh", "r");
+    FILE* arq = fopen("bvh/Male1_B3_Walk.bvh", "r");
     if(arq == NULL) {
         printf("Erro! Arquivo não encontrado!\n");
         exit(EXIT_FAILURE);
@@ -206,7 +206,6 @@ void myInitMaleSKel()
     Node* rToe2 = createNode("RToe2", rToe, channels[26], offsets[26][0], offsets[26][1], offsets[26][2], 0);
 
 
-    int dataCount = 1;
     for(int i = 0; i < 134; i++){
         fgets(aux, 200, arq);
     }
@@ -218,10 +217,16 @@ void myInitMaleSKel()
             channelSum = channelSum + 1;
         }
     }
-    for(int i = 0; i < 282; i++){
-        for(int j = 0; j < channelSum; j++){
-            fscanf(arq, "%f", &animData[i][j]);
-            printf("data read: %f \n", animData[i][j]);
+
+    float auxFloat = 0;
+    int auxOffset = 0;
+    while(fscanf(arq, "%f", &auxFloat) != EOF){
+        animData[totalFrames][auxOffset] = auxFloat;
+        printf("data read: %f \n", animData[totalFrames][auxOffset]);
+        auxOffset++;
+        if(auxOffset == channelSum){
+            auxOffset = 0;
+            totalFrames++;
         }
     }
 
@@ -229,26 +234,6 @@ void myInitMaleSKel()
     apply();
 }
 
-/*void createData(int *channels[]){
-    float auxf = 0;
-    while(dataCount < 5){
-        fscanf(arq, "%f", &auxf);
-        if(auxf == 0){
-            break;
-        }
-        animData[0][0] = auxf;
-        printf("animData: %f\n", animData[0][0]);
-        for(int i = 0; i < 27; i++){
-            for(int j = 0; j < channels[i]; j++){
-                fscanf(arq, "%f", &animData[0][dataCount]);
-                //printf("animData: %f -- ", animData[0][dataCount]);
-                dataCount++;
-            }
-        }
-
-        dataCount = 1;
-    }
-}*/
 
 float orange[] = { 1, 0.5, 0 };
 float yellow[] = { 1, 1, 0 };
