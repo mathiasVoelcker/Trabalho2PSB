@@ -97,16 +97,7 @@ Node* createNode(char name[20], Node* parent, int numChannels, float ofx, float 
 //
 // DADOS DE EXEMPLO DO PRIMEIRO FRAME
 //
-float animData[282][69];
-
-float data[] = { -326.552, 98.7701, 317.634, 71.4085, 60.8487, 17.2406, -70.1915, 0, 88.8779, 84.6529, 68.0632,
-                 -5.27801, 0.719492, 15.2067, 13.3733, -135.039, 24.774, 172.053, -171.896, 64.9682, -165.105,
-                 3.6548, 1.03593, -36.4128, -55.7886, 37.8019, -120.338, 9.39682, 14.0503, -27.1815, 4.41274,
-                 -0.125185, -1.52942, 1.33299, -4.20935, 46.1022, -92.5385, -35.676, 63.2656, -5.23096, -15.2195,
-                 9.30354, 11.1114, -0.982512, -11.0421, -86.4319, -3.01435, 76.3394, 1.71268, 24.9011, -2.42099,
-                 9.483, 17.5267, -1.42749, -37.0021, -44.3019, -39.1702, -46.2538, -2.58689, 78.4703, 1.9216, 29.8211,
-                 -1.99744, -3.70506, 1.06523, 0.577189, 0.146783, 3.70013, 2.9702 };
-
+float animData[1000][1000];
 // Pos. da aplicacao dos dados
 
 int dataPos;
@@ -135,7 +126,7 @@ void apply()
 void myInitMaleSKel()
 {
     char *line;
-    FILE* arq = fopen("bvh/Male1_B3_Walk.bvh", "r");
+    FILE* arq = fopen("bvh/Male1_C24_QuickSideStepLeft.bvh", "r");
     if(arq == NULL) {
         printf("Erro! Arquivo não encontrado!\n");
         exit(EXIT_FAILURE);
@@ -222,14 +213,12 @@ void myInitMaleSKel()
     int auxOffset = 0;
     while(fscanf(arq, "%f", &auxFloat) != EOF){
         animData[totalFrames][auxOffset] = auxFloat;
-        printf("data read: %f \n", animData[totalFrames][auxOffset]);
         auxOffset++;
         if(auxOffset == channelSum){
             auxOffset = 0;
             totalFrames++;
         }
     }
-
     //createData(&channels);
     apply();
 }
